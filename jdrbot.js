@@ -1,0 +1,354 @@
+/**
+ * Created by Baka Killer on 29/05/2017.
+ */
+const Discord = require('discord.js');
+const client = new Discord.Client();
+const letters = {
+    a:0,
+    b:1,
+    c:2,
+    d:3,
+    e:4,
+    f:5,
+    g:6,
+    h:7,
+    i:8,
+    j:9,
+    k:10,
+    l:11,
+    m:12,
+    n:13,
+    o:14,
+    p:15,
+    q:16,
+    r:17,
+    s:18,
+    t:19,
+    u:20,
+    v:21,
+    w:22,
+    x:23,
+    y:24,
+    z:25,
+    aa:26,
+    ab:27,
+    ac:28,
+    ad:29,
+    ae:30,
+    af:31,
+    ag:32,
+    ah:33,
+    ai:34,
+    aj:35,
+    ak:36
+};
+
+var fs = require('fs');
+var readline = require('readline');
+var google = require('googleapis');
+var googleAuth = require('google-auth-library');
+
+var gamedata;
+var users = {};
+var sheets = {};
+var isgameon = false;
+
+// If modifying these scopes, delete your previously saved credentials
+// at ~/.credentials/sheets.googleapis.com-nodejs-quickstart.json
+var SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
+var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
+    process.env.USERPROFILE) + '\\.credentials\\';
+var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json';
+console.log(TOKEN_PATH);
+/**
+ * Create an OAuth2 client with the given credentials, and then execute the
+ * given callback function.
+ *
+ * @param {Object} credentials The authorization client credentials.
+ * @param {function} callback The callback to call with the authorized client.
+ */
+function authorize(credentials, callback, character, chan) {
+    var clientSecret = credentials.installed.client_secret;
+    var clientId = credentials.installed.client_id;
+    var redirectUrl = credentials.installed.redirect_uris[0];
+    var auth = new googleAuth();
+    var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
+
+    // Check if we have previously stored a token.
+    fs.readFile(TOKEN_PATH, function(err, token) {
+        if (err) {
+            getNewToken(oauth2Client, callback, character, chan);
+        } else {
+            oauth2Client.credentials = JSON.parse(token);
+            callback(oauth2Client, character, chan);
+        }
+    });
+}
+
+/**
+ * Get and store new token after prompting for user authorization, and then
+ * execute the given callback with the authorized OAuth2 client.
+ *
+ * @param {google.auth.OAuth2} oauth2Client The OAuth2 client to get token for.
+ * @param {getEventsCallback} callback The callback to call with the authorized
+ *     client.
+ */
+function getNewToken(oauth2Client, callback, character, chan) {
+    var authUrl = oauth2Client.generateAuthUrl({
+        access_type: 'offline',
+        scope: SCOPES
+    });
+    console.log('Authorize this app by visiting this url: ', authUrl);
+    var rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    rl.question('Enter the code from that page here: ', function(code) {
+        rl.close();
+        oauth2Client.getToken(code, function(err, token) {
+            if (err) {
+                console.log('Error while trying to retrieve access token', err);
+                return;
+            }
+            oauth2Client.credentials = token;
+            storeToken(token);
+            callback(oauth2Client, character, chan);
+        });
+    });
+}
+
+/**
+ * Store token to disk be used in later program executions.
+ *
+ * @param {Object} token The token to store to disk.
+ */
+function storeToken(token) {
+    try {
+        fs.mkdirSync(TOKEN_DIR);
+    } catch (err) {
+        if (err.code != 'EEXIST') {
+            throw err;
+        }
+    }
+    fs.writeFile(TOKEN_PATH, JSON.stringify(token));
+    console.log('Token stored to ' + TOKEN_PATH);
+}
+
+function link_to(user, character, chan) {
+    if (character in gamedata.characters) {
+        users[user] = character;
+        // Load client secrets from a local file.
+        fs.readFile('client_secret.json', function processClientSecrets(err, content) {
+            if (err) {
+                console.log('Error loading client secret file: ' + err);
+                return;
+            }
+            // Authorize a client with the loaded credentials, then call the
+            // Google Sheets API.
+            authorize(JSON.parse(content), get_sheet, character, chan);
+        });
+        return true;
+    } else {
+        return false
+    }
+}
+
+function get_sheet(auth, character, chan) {
+    var gsheets = google.sheets('v4');
+    gsheets.spreadsheets.values.get({
+        auth: auth,
+        spreadsheetId: gamedata.characters[character],
+        range: gamedata.range
+    }, function(err, resp) {
+        if (err) {
+            console.log('ERROR ! - ' + err);
+            return false;
+        }
+        set_sheet(character, resp.values, chan);
+    })
+}
+
+function set_sheet(character, content, chan) {
+    sheets[character] = content;
+    chan.send(character + ' added.');
+}
+
+function prepare_game(game) {
+    gamedata = JSON.parse(fs.readFileSync('./gamedata.json'));
+    if (gamedata.hasOwnProperty(game)) {
+        gamedata = gamedata[game];
+        isgameon = true;
+        return true;
+    }
+    return false;
+}
+
+function get_char(user, char) {
+    if (char in gamedata.char && user in users) {
+        var charpos = gamedata.char[char];
+        charpos = charpos.split('!');
+        return parseInt(sheets[users[user]][charpos[1]-1][letters[charpos[0]]]);
+    } else {
+        console.log(char + "\n" + JSON.stringify(gamedata.char) + "\n\n");
+        console.log(user + "\n" + JSON.stringify(users) + "\n\n");
+        if (char in gamedata.char) {
+            console.log('In char');
+        }
+        if (user in users) {
+            console.log('in users');
+        }
+        return false;
+    }
+}
+
+function roll(toroll) {
+    var roll = toroll.split('d');
+    var rollresult = '';
+    for (var i = 0; i < roll[0]; i++) {
+        if (i !== 0) {
+            rollresult += ' - ';
+        }
+        rollresult += Math.floor(Math.random() * roll[1]) + 1;
+    }
+    return rollresult;
+}
+
+function savegame(name, version) {
+
+}
+
+function roll_char(user, chartocheck, sr) {
+    if (sr === undefined) {
+        sr = false;
+    }
+    var char = get_char(user, chartocheck);
+    var dicetoroll = get_system_val('dice');
+    var rollresult = roll(dicetoroll);
+    var result = "";
+    if (get_system_val('multipledice')) {
+        // TODO
+    } else {
+        var action = get_system_val('action');
+        var goal = get_system_val('goal');
+        switch (action) {
+            case "comp":
+                if (goal === "over") {
+                    result += (rollresult >= char) ? "Success !" : "Failure !";
+                    result += " You rolled a " + rollresult + " over " + chartocheck + " (" + char + ")";
+                } else if (goal === "sub") {
+                    result += (rollresult <= char) ? "Success !" : "Failure !";
+                    result += " You rolled a " + rollresult + " under " + chartocheck + " (" + char + ")";
+                }
+                break;
+            case "add":
+                if (goal === "over" && sr !== false) {
+                    result += ((parseInt(rollresult) + parseInt(char)) >= sr) ? "Success ! " : "Failure ! ";
+                } else if (goal === "sub" && sr !== false) {
+                    result += ((parseInt(rollresult) + parseInt(char)) <= sr) ? "Success ! " : "Failure ! ";
+                }
+                result += "You got a " + (parseInt(rollresult) + parseInt(char));
+                result += " (" + chartocheck + ":" + char + " + rolled " + rollresult + ")";
+                break;
+            case "remove":
+                if (goal === "over" && sr !== false) {
+                    result += ((rollresult - char) >= sr) ? "Success ! " : "Failure ! ";
+                } else if (goal === "sub" && sr !== false) {
+                    result += ((rollresult - char) <= sr) ? "Success ! " : "Failure ! ";
+                }
+                result += "You got a " + (rollresult - char);
+                result += " (" + chartocheck + ":" + char + " - rolled " + rollresult + ")";
+                break;
+            default:
+                return false;
+        }
+        return result;
+    }
+}
+
+function get_system_val(val) {
+    return gamedata.dicesystem[val];
+}
+
+client.on('ready', function () {
+    console.log('READY !');
+});
+
+client.on('message', function (message) {
+    var received = message.content;
+    if (message.author.tag === "JDRBot#7510" && received === "Goodbye !") {
+        process.exit();
+    } else if (received.substr(0, 4) === '!jdr') {
+        received = received.split(' ');
+        switch (received[1]) {
+            case 'roll':
+                if (!isNaN(parseInt(received[2].charAt(0)))) {
+                    var rollresult = roll(received[2]);
+                    message.reply(rollresult);
+                } else {
+                    if (!isgameon) {
+                        message.reply('You should start a game or send a valid basic request. See !jdr help for details.');
+                        break;
+                    }
+                    // console.log(JSON.stringify(users[message.author.tag]));
+                    // console.log(JSON.stringify(sheets[users[message.author.tag]]));
+                    if (users[message.author.tag] === undefined || sheets[users[message.author.tag]] === undefined) {
+                        message.reply('Are you linked to a character ? Be sure your character is registered already.');
+                        break;
+                    }
+                    var rollresult = roll_char(message.author.tag, received[2], received[3]);
+                    if (rollresult) {
+                        message.reply(rollresult);
+                    } else {
+                        message.reply("Sorry, the game seem to be badly set up. You get a critical success on shooting the admin with tomatoes !");
+                    }
+                }
+                break;
+            case 'help':
+                message.reply('Call "!jdbot roll xdy" to roll a x dice with y faces. For instance, "!jdr roll 2d10" will roll two ten sided dice.');
+                break;
+            case 'start':
+                if (prepare_game(received[2])) {
+                    message.channel.send('Started ' + received[2]);
+                } else {
+                    message.channel.send('The game ' + received[2] + ' has not been found !');
+                }
+                break;
+            case 'linkto':
+                if (link_to(message.author.tag, received[2], message.channel)) {
+                    message.channel.send("Adding " + received[2] + " to user " + message.author.tag + "...");
+                } else {
+                    message.channel.send("Never heard of this character ! Is it written correctly ?");
+                }
+                break;
+            case 'check':
+                var carac = get_char(message.author.tag, received[2]);
+                if (carac) {
+                    message.channel.send(received[2] + ' : ' + carac);
+                } else {
+                    message.channel.send('Not found !');
+                }
+                break;
+            case 'shutdown':
+                if (message.author.tag === "Baka Killer#8806") {
+                    message.channel.send('Goodbye !');
+                }
+                break;
+            default :
+                message.reply('What are you trying to do ? You can call "!jdrw help" to see how to use.');
+        }
+    }
+});
+
+client.login('MzE4NTI0MjQzOTcxNDA3ODg3.DAzoYg.nZyECJ-aERngiIpLjhltKwKbIpg');
+
+//
+// var http = require('http');
+// var url = require('url');
+//
+// var server = http.createServer(function (req, res) {
+//     res.writeHead(200, {"Content-Type": "application/json"});
+//     var myurl = url.parse(req.url).pathname;
+//     res.end(JSON.stringify({object: "THIS", machin: "THAT", url: myurl}));
+// });
+//
+// server.listen(8080);

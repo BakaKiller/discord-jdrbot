@@ -1,0 +1,18 @@
+{
+  "name": "jdrbot",
+  "version": "1.0.0",
+  "description": "A role playing helper",
+  "main": "jdrbot.js",
+  "dependencies": {
+    "discord.js": "^11.1.0",
+    "google-auth-library": "^0.10.0",
+    "googleapis": "^19.0.0",
+    "start": "^5.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,42 @@
+{
+  "d20medieval": {
+    "characters": {
+      "ancientdrake": "1shP0zue2TLcIMu6DHtznlH1mqhis4slcuz_fjCYCE0c"
+    },
+    "char": {
+      "AGI": "c!6",
+      "CHA": "c!7",
+      "CON": "c!8",
+      "DEX": "c!9",
+      "FOR": "c!10",
+      "INT": "c!11",
+      "PER": "c!12",
+      "PUI": "c!13",
+      "VOL": "c!14",
+      "CHANCE": "c!15"
+    },
+    "range":"A1:X17",
+    "dicesystem":{
+      "dice": "1d20",
+      "action": "add",
+      "goal": "over",
+      "multipledice": false
+    }
+  },
+  "empty": {
+    "characters": {
+      "character": "googlesheetid"
+    },
+    "char": {
+      "charname": "letter!number"
+    },
+    "range": "A1:AK1000",
+    "dicesystem":{
+      "dice": "xdy",
+      "action": "comp or add or remove",
+      "goal": "over or sub or false",
+      "multipledice": "true or false without quotes",
+      "method": "+ or - or avg or each"
+    }
+  }
+}
