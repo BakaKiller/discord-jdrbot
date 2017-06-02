@@ -4,50 +4,52 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const letters = {
-    a:0,
-    b:1,
-    c:2,
-    d:3,
-    e:4,
-    f:5,
-    g:6,
-    h:7,
-    i:8,
-    j:9,
-    k:10,
-    l:11,
-    m:12,
-    n:13,
-    o:14,
-    p:15,
-    q:16,
-    r:17,
-    s:18,
-    t:19,
-    u:20,
-    v:21,
-    w:22,
-    x:23,
-    y:24,
-    z:25,
-    aa:26,
-    ab:27,
-    ac:28,
-    ad:29,
-    ae:30,
-    af:31,
-    ag:32,
-    ah:33,
-    ai:34,
-    aj:35,
-    ak:36
+    a: 0,
+    b: 1,
+    c: 2,
+    d: 3,
+    e: 4,
+    f: 5,
+    g: 6,
+    h: 7,
+    i: 8,
+    j: 9,
+    k: 10,
+    l: 11,
+    m: 12,
+    n: 13,
+    o: 14,
+    p: 15,
+    q: 16,
+    r: 17,
+    s: 18,
+    t: 19,
+    u: 20,
+    v: 21,
+    w: 22,
+    x: 23,
+    y: 24,
+    z: 25,
+    aa: 26,
+    ab: 27,
+    ac: 28,
+    ad: 29,
+    ae: 30,
+    af: 31,
+    ag: 32,
+    ah: 33,
+    ai: 34,
+    aj: 35,
+    ak: 36
 };
 
 var fs = require('fs');
 var readline = require('readline');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library');
+var mkdirp = require('mkdirp');
 
+var ongoinggame = null;
 var gamedata;
 var users = {};
 var sheets = {};
@@ -75,7 +77,7 @@ function authorize(credentials, callback, character, chan) {
     var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 
     // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, function(err, token) {
+    fs.readFile(TOKEN_PATH, function (err, token) {
         if (err) {
             getNewToken(oauth2Client, callback, character, chan);
         } else {
@@ -103,9 +105,9 @@ function getNewToken(oauth2Client, callback, character, chan) {
         input: process.stdin,
         output: process.stdout
     });
-    rl.question('Enter the code from that page here: ', function(code) {
+    rl.question('Enter the code from that page here: ', function (code) {
         rl.close();
-        oauth2Client.getToken(code, function(err, token) {
+        oauth2Client.getToken(code, function (err, token) {
             if (err) {
                 console.log('Error while trying to retrieve access token', err);
                 return;
@@ -159,7 +161,7 @@ function get_sheet(auth, character, chan) {
         auth: auth,
         spreadsheetId: gamedata.characters[character],
         range: gamedata.range
-    }, function(err, resp) {
+    }, function (err, resp) {
         if (err) {
             console.log('ERROR ! - ' + err);
             return false;
@@ -178,6 +180,7 @@ function prepare_game(game) {
     if (gamedata.hasOwnProperty(game)) {
         gamedata = gamedata[game];
         isgameon = true;
+        ongoinggame = game;
         return true;
     }
     return false;
@@ -187,7 +190,7 @@ function get_char(user, char) {
     if (char in gamedata.char && user in users) {
         var charpos = gamedata.char[char];
         charpos = charpos.split('!');
-        return parseInt(sheets[users[user]][charpos[1]-1][letters[charpos[0]]]);
+        return parseInt(sheets[users[user]][charpos[1] - 1][letters[charpos[0]]]);
     } else {
         console.log(char + "\n" + JSON.stringify(gamedata.char) + "\n\n");
         console.log(user + "\n" + JSON.stringify(users) + "\n\n");
@@ -213,8 +216,72 @@ function roll(toroll) {
     return rollresult;
 }
 
-function savegame(name, version) {
+function loadgame(game, name, version, chan) {
+    var path = 'saves/' + game + '/' + name + '/' + version + '/';
+    if (fs.existsSync(path)) {
+        gamedata = JSON.parse(fs.readFileSync(path + 'gamedata.json'));
+        users = JSON.parse(fs.readFileSync(path + 'users.json'));
+        ongoinggame = game;
+        isgameon = true;
+        for (var usr in users) {
+            if (users.hasOwnProperty(usr)) {
+                link_to(usr, users[usr], chan);
+            }
+        }
+    } else {
+        return "This save does not exist !";
+    }
+}
 
+function savegame(name, version) {
+    if (isgameon && ongoinggame !== null && name !== null && version !== null) {
+        var ok = true;
+        var mess = "";
+
+        mkdirp('saves/' + ongoinggame + '/' + name + '/' + version + '/', function (err) {
+            if (err) {
+                console.log(err);
+                ok = false;
+                mess += "Folders couldn't be created !\n";
+            } else {
+                fs.writeFile(
+                    'saves/' + ongoinggame + '/' + name + '/' + version + '/users.json',
+                    JSON.stringify(users),
+                    function (err) {
+                        if (err) {
+                            console.log(err);
+                            ok = false;
+                            console.log('saves/' + ongoinggame + '/' + name + '/' + version + '/users.json');
+                            mess += "Couldn't save users.json...\n";
+                        } else {
+                            mess += "Saved users.json...\n";
+                        }
+                    }
+                );
+                fs.writeFile(
+                    'saves/' + ongoinggame + '/' + name + '/' + version + '/gamedata.json',
+                    JSON.stringify(gamedata),
+                    function (err) {
+                        if (err) {
+                            console.log(err);
+                            ok = false;
+                            mess += "Couldn't save gamedata.json...\n";
+                        } else {
+                            mess += "Saved gamedata.json...\n";
+                        }
+                    }
+                );
+            }
+        });
+        if (ok) {
+            mess += "Everything was properly saved !";
+        } else {
+            mess += "There were errors during saving !";
+        }
+        return mess;
+    } else {
+        return "Nothing has been saved ! Is the game launched, and did you set your save correctly ?";
+    }
 }
 
 function roll_char(user, chartocheck, sr) {
@@ -328,13 +395,19 @@ client.on('message', function (message) {
                     message.channel.send('Not found !');
                 }
                 break;
+            case 'save':
+                message.channel.send(savegame(received[2], received[3]));
+                break;
+            case 'load':
+                loadgame(received[2], received[3], received[4], message.channel);
+                break;
             case 'shutdown':
                 if (message.author.tag === "Baka Killer#8806") {
                     message.channel.send('Goodbye !');
                 }
                 break;
             default :
-                message.reply('What are you trying to do ? You can call "!jdrw help" to see how to use.');
+                message.reply('What are you trying to do ? You can call "!jdr help" to see how to use.');
         }
     }
 });
