@@ -4,16 +4,16 @@
       "ancientdrake": "1shP0zue2TLcIMu6DHtznlH1mqhis4slcuz_fjCYCE0c"
     },
     "char": {
-      "AGI": "c!6",
-      "CHA": "c!7",
-      "CON": "c!8",
-      "DEX": "c!9",
-      "FOR": "c!10",
-      "INT": "c!11",
-      "PER": "c!12",
-      "PUI": "c!13",
-      "VOL": "c!14",
-      "CHANCE": "c!15"
+      "agi": "c!6",
+      "cha": "c!7",
+      "con": "c!8",
+      "dex": "c!9",
+      "for": "c!10",
+      "int": "c!11",
+      "per": "c!12",
+      "pui": "c!13",
+      "vol": "c!14",
+      "chance": "c!15"
     },
     "range":"A1:X17",
     "dicesystem":{
@@ -29,13 +29,13 @@
       "sephii": "1NeYw9PWA7TNrJhuz_Du0TkHPVjf8TNSFeVOUf0Veivk"
     },
     "char": {
-      "Feu": "a!10",
-      "Metal": "e!10",
-      "Terre": "c!12",
-      "Bois": "a!16",
-      "Eau": "e!16",
-      "MaxChi": "c!21",
-      "Chi": "b!21"
+      "feu": "a!10",
+      "metal": "e!10",
+      "terre": "c!12",
+      "bois": "a!16",
+      "eau": "e!16",
+      "maxchi": "c!21",
+      "chi": "b!21"
     },
     "range":"A1:Q57",
     "dicesystem":{

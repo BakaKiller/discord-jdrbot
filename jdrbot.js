@@ -187,6 +187,7 @@ function prepare_game(game) {
 }
 
 function get_char(user, char) {
+    char = char.toLowerCase();
     if (char in gamedata.char && user in users) {
         var charpos = gamedata.char[char];
         charpos = charpos.split('!');
@@ -288,6 +289,7 @@ function roll_char(user, chartocheck, sr) {
     if (sr === undefined) {
         sr = false;
     }
+    chartocheck = chartocheck.toLowerCase();
     var char = get_char(user, chartocheck);
     var goal = get_system_val('goal');
     var action = get_system_val('action');
@@ -411,9 +413,16 @@ client.on('message', function (message) {
                     message.channel.send('The game ' + received[2] + ' has not been found !');
                 }
                 break;
-            case 'linkto':
+            case 'link':
                 if (link_to(message.author.tag, received[2], message.channel)) {
                     message.channel.send("Adding " + received[2] + " to user " + message.author.tag + "...");
+                } else {
+                    message.channel.send("Never heard of this character ! Is it written correctly ?");
+                }
+                break;
+            case 'linkto':
+                if (link_to(received[2], received[3], message.channel)) {
+                    message.channel.send("Adding " + received[3] + " to user " + received[2] + "...");
                 } else {
                     message.channel.send("Never heard of this character ! Is it written correctly ?");
                 }
