@@ -23,6 +23,29 @@
       "multipledice": false
     }
   },
+  "qin": {
+    "characters": {
+      "dert": "1NeYw9PWA7TNrJhuz_Du0TkHPVjf8TNSFeVOUf0Veivk",
+      "sephii": "1NeYw9PWA7TNrJhuz_Du0TkHPVjf8TNSFeVOUf0Veivk"
+    },
+    "char": {
+      "Feu": "a!10",
+      "Metal": "e!10",
+      "Terre": "c!12",
+      "Bois": "a!16",
+      "Eau": "e!16",
+      "MaxChi": "c!21",
+      "Chi": "b!21"
+    },
+    "range":"A1:Q57",
+    "dicesystem":{
+      "dice": "2d10",
+      "action": "add",
+      "goal": "over",
+      "multipledice": true,
+      "method": "-"
+    }
+  },
   "empty": {
     "characters": {
       "character": "googlesheetid"
@@ -36,7 +59,7 @@
       "action": "comp or add or remove",
       "goal": "over or sub or false",
       "multipledice": "true or false without quotes",
-      "method": "+ or - or avg or each"
+      "method": "+ or - or avg"
     }
   }
 }
