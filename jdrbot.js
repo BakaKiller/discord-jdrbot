@@ -295,6 +295,7 @@ function roll_char(user, chartocheck, sr) {
     var rollresult = roll(dicetoroll);
     var result = "";
     if (get_system_val('multipledice')) {
+        var rolldetails = rollresult;
         var method = get_system_val('method');
         rollresult = rollresult.split(' - ');
         var value = 0;
@@ -318,42 +319,48 @@ function roll_char(user, chartocheck, sr) {
                 value = sum / rollresult.length;
                 break;
         }
-        // TODO : End this properly
-        return value;
-    } else {
-        switch (action) {
-            case "comp":
-                if (goal === "over") {
-                    result += (rollresult >= char) ? "Success !" : "Failure !";
-                    result += " You rolled a " + rollresult + " over " + chartocheck + " (" + char + ")";
-                } else if (goal === "sub") {
-                    result += (rollresult <= char) ? "Success !" : "Failure !";
-                    result += " You rolled a " + rollresult + " under " + chartocheck + " (" + char + ")";
-                }
-                break;
-            case "add":
-                if (goal === "over" && sr !== false) {
-                    result += ((parseInt(rollresult) + parseInt(char)) >= sr) ? "Success ! " : "Failure ! ";
-                } else if (goal === "sub" && sr !== false) {
-                    result += ((parseInt(rollresult) + parseInt(char)) <= sr) ? "Success ! " : "Failure ! ";
-                }
-                result += "You got a " + (parseInt(rollresult) + parseInt(char));
-                result += " (" + chartocheck + ":" + char + " + rolled " + rollresult + ")";
-                break;
-            case "remove":
-                if (goal === "over" && sr !== false) {
-                    result += ((rollresult - char) >= sr) ? "Success ! " : "Failure ! ";
-                } else if (goal === "sub" && sr !== false) {
-                    result += ((rollresult - char) <= sr) ? "Success ! " : "Failure ! ";
-                }
-                result += "You got a " + (rollresult - char);
-                result += " (" + chartocheck + ":" + char + " - rolled " + rollresult + ")";
-                break;
-            default:
-                return false;
-        }
-        return result;
+        rollresult = value < 0 ? value * -1 : value;
     }
+    switch (action) {
+        case "comp":
+            if (goal === "over") {
+                result += (rollresult >= char) ? "Success !" : "Failure !";
+                result += " You rolled a " + rollresult;
+                result += get_system_val('multipledice') ? " (" + rolldetails + ")" : '';
+                result += " over " + chartocheck + " (" + char + ")";
+            } else if (goal === "sub") {
+                result += (rollresult <= char) ? "Success !" : "Failure !";
+                result += " You rolled a " + rollresult;
+                result += get_system_val('multipledice') ? " (" + rolldetails + ")" : '';
+                result += " under " + chartocheck + " (" + char + ")";
+            }
+            break;
+        case "add":
+            if (goal === "over" && sr !== false) {
+                result += ((parseInt(rollresult) + parseInt(char)) >= sr) ? "Success ! " : "Failure ! ";
+            } else if (goal === "sub" && sr !== false) {
+                result += ((parseInt(rollresult) + parseInt(char)) <= sr) ? "Success ! " : "Failure ! ";
+            }
+            result += "You got a " + (parseInt(rollresult) + parseInt(char));
+            result += " (" + chartocheck + ": " + char + " + rolled " + rollresult;
+            result += get_system_val('multipledice') ? " (" + rolldetails + ")" : '';
+            result += ")";
+            break;
+        case "remove":
+            if (goal === "over" && sr !== false) {
+                result += ((rollresult - char) >= sr) ? "Success ! " : "Failure ! ";
+            } else if (goal === "sub" && sr !== false) {
+                result += ((rollresult - char) <= sr) ? "Success ! " : "Failure ! ";
+            }
+            result += "You got a " + (rollresult - char);
+            result += " (" + chartocheck + ": " + char + " - rolled " + rollresult;
+            result += get_system_val('multipledice') ? " (" + rolldetails + ")" : '';
+            result += ")";
+            break;
+        default:
+            return false;
+    }
+    return result;
 }
 
 function get_system_val(val) {
