@@ -289,14 +289,38 @@ function roll_char(user, chartocheck, sr) {
         sr = false;
     }
     var char = get_char(user, chartocheck);
+    var goal = get_system_val('goal');
+    var action = get_system_val('action');
     var dicetoroll = get_system_val('dice');
     var rollresult = roll(dicetoroll);
     var result = "";
     if (get_system_val('multipledice')) {
-        // TODO
+        var method = get_system_val('method');
+        rollresult = rollresult.split(' - ');
+        var value = 0;
+        switch (method) {
+            case '+':
+                for (var i = 0; i < rollresult.length; i++) {
+                    value += rollresult[i];
+                }
+                break;
+            case '-':
+                value += rollresult[0];
+                for (var i = 1; i < rollresult.length; i++) {
+                    value -= rollresult[i];
+                }
+                break;
+            case 'avg':
+                var sum = 0;
+                for (var i = 0; i < rollresult.length; i++) {
+                    sum += rollresult[i];
+                }
+                value = sum / rollresult.length;
+                break;
+        }
+        // TODO : End this properly
+        return value;
     } else {
-        var action = get_system_val('action');
-        var goal = get_system_val('goal');
         switch (action) {
             case "comp":
                 if (goal === "over") {
