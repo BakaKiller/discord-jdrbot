@@ -234,6 +234,44 @@ function loadgame(game, name, version, chan) {
     }
 }
 
+function get_number(name) {
+    name = name.toLowerCase();
+    var alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
+    var sum = 0;
+    for (var i = 0; i < name.length; i++) {
+        sum += (alphabet.indexOf(name[i]) + 1);
+    }
+    sum = sum.toString().split('');
+    var total = 1;
+    for (i = 0; i < sum.length; i++) {
+        total = total * (sum[i]);
+    }
+
+    if (total >= 50) {
+        total = total / 2;
+    }
+
+    var rocknumbers = [7, 14, 21, 28, 35, 42, 49];
+    var rocks = {
+        7: 'Citrine',
+        14: 'Héliodore',
+        21: 'Apatite',
+        28: 'Lapis-Lazuli',
+        35: 'Garnet',
+        42: 'Quartz',
+        49: 'Morganite'
+    };
+    var cat = 0;
+    for (i = 0; i < rocknumbers.length; i++) {
+        if (total < rocknumbers[i]) {
+            cat = rocknumbers[i];
+            break;
+        }
+    }
+
+    return rocks[cat];
+}
+
 function savegame(name, version) {
     if (isgameon && ongoinggame !== null && name !== null && version !== null) {
         var ok = true;
@@ -380,6 +418,10 @@ client.on('message', function (message) {
     } else if (received.substr(0, 4) === '!jdr') {
         received = received.split(' ');
         switch (received[1]) {
+            case 'name':
+                var name = message.content.substr(9);
+                message.reply(get_number(name));
+                break;
             case 'roll':
                 if (!isNaN(parseInt(received[2].charAt(0)))) {
                     var rollresult = roll(received[2]);
