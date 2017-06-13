@@ -44,16 +44,19 @@ const letters = {
 };
 
 var fs = require('fs');
+var opus = require('node-opus');
 var readline = require('readline');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library');
 var mkdirp = require('mkdirp');
 
+var voicechan = null;
 var ongoinggame = null;
 var gamedata;
 var users = {};
 var sheets = {};
 var isgameon = false;
+var dispatcher = null;
 
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/sheets.googleapis.com-nodejs-quickstart.json
@@ -407,6 +410,25 @@ function get_system_val(val) {
     return gamedata.dicesystem[val];
 }
 
+function play(track) {
+    if (track !== '') {
+        dispatcher = voicechan.playFile('./audio/' + track + '.mp3');
+        dispatcher.on("end", function (end) {
+            play(track);
+        });
+    } else {
+        dispatcher.pause();
+        dispatcher = null;
+    }
+}
+
+function stop() {
+    if (dispatcher !== null) {
+        dispatcher.pause();
+        dispatcher = null;
+    }
+}
+
 client.on('ready', function () {
     console.log('READY !');
 });
@@ -418,6 +440,29 @@ client.on('message', function (message) {
     } else if (received.substr(0, 4) === '!jdr') {
         received = received.split(' ');
         switch (received[1]) {
+            case 'play':
+                play(received[2]);
+                break;
+            case 'stop':
+                stop();
+                break;
+            case 'join':
+                if (!message.guild) {
+                    message.reply('This command is only usable on a Guild.');
+                    break;
+                }
+                if (message.member.voiceChannel) {
+                    message.member.voiceChannel.join().then(function (connection) {
+                        voicechan = connection;
+                        console.log('Connected to a voice channel.');
+                    }).catch(function(error) {
+                        console.log('Error !' + error)
+                    });
+                }
+                break;
+            case 'leave':
+                message.member.voiceChannel.leave();
+                break;
             case 'name':
                 var name = message.content.substr(9);
                 message.reply(get_number(name));

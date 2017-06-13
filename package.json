@@ -8,7 +8,10 @@
     "google-auth-library": "^0.10.0",
     "googleapis": "^19.0.0",
     "start": "^5.1.0",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "ffmpeg": "^0.0.4",
+    "ffmpeg-binaries": "^3.2.2-3",
+    "node-opus": "^0.2.6"
   },
   "devDependencies": {},
   "scripts": {
