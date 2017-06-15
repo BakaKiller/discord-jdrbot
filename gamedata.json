@@ -1,7 +1,7 @@
 {
   "d20medieval": {
     "characters": {
-      "ancientdrake": "1shP0zue2TLcIMu6DHtznlH1mqhis4slcuz_fjCYCE0c"
+      "elradrim": "1shP0zue2TLcIMu6DHtznlH1mqhis4slcuz_fjCYCE0c"
     },
     "char": {
       "agi": "c!6",
@@ -13,7 +13,47 @@
       "per": "c!12",
       "pui": "c!13",
       "vol": "c!14",
-      "chance": "c!15"
+      "chance": "c!15",
+      "esquive": "j!6",
+      "convaincre": "j!7",
+      "encaissement": "j!8",
+      "parade": "j!9",
+      "attaque": "j!10",
+      "savoir": "j!11",
+      "vigilence": "j!12",
+      "regeneration": "j!13",
+      "torture": "j!14",
+      "trouvaille": "j!15",
+      "acrobatie": "q!6",
+      "seduire": "q!7",
+      "resmaladie": "q!8",
+      "bidouillage": "q!9",
+      "traction": "q!10",
+      "mensonge": "q!11",
+      "sensmagique": "q!12",
+      "sort": "q!13",
+      "determination": "q!14",
+      "coupdedestin": "q!15",
+      "reflexes": "x!6",
+      "galvaniser": "x!7",
+      "guerison": "x!8",
+      "visee": "x!9",
+      "lancer": "x!10",
+      "ingeniosite": "x!11",
+      "observation": "x!12",
+      "absorption": "x!13",
+      "courage": "x!14",
+      "tiragejuste": "x!15",
+      "exp": "r!2",
+      "pv": "f!2",
+      "pvmax": "h!2",
+      "pm": "f!3",
+      "pmmax": "h!3",
+      "bonuspv": "m!2",
+      "bonuspm": "m!3",
+      "nom": "b!1",
+      "race": "b!2",
+      "classe": "b!3"
     },
     "range":"A1:X17",
     "dicesystem":{
