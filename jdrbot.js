@@ -468,25 +468,31 @@ client.on('message', function (message) {
                 message.reply(get_number(name));
                 break;
             case 'roll':
-                if (!isNaN(parseInt(received[2].charAt(0)))) {
-                    var rollresult = roll(received[2]);
-                    message.reply(rollresult);
-                } else {
-                    if (!isgameon) {
-                        message.reply('You should start a game or send a valid basic request. See !jdr help for details.');
-                        break;
-                    }
-                    // console.log(JSON.stringify(users[message.author.tag]));
-                    // console.log(JSON.stringify(sheets[users[message.author.tag]]));
-                    if (users[message.author.tag] === undefined || sheets[users[message.author.tag]] === undefined) {
-                        message.reply('Are you linked to a character ? Be sure your character is registered already.');
-                        break;
-                    }
-                    var rollresult = roll_char(message.author.tag, received[2], received[3]);
-                    if (rollresult) {
+                if (received[2] !== undefined) {
+                    if (!isNaN(parseInt(received[2].charAt(0)))) {
+                        var rollresult = roll(received[2]);
                         message.reply(rollresult);
                     } else {
-                        message.reply("Sorry, the game seem to be badly set up. You get a critical success on shooting the admin with tomatoes !");
+                        if (!isgameon) {
+                            message.reply('You should start a game or send a valid basic request. See !jdr help for details.');
+                            break;
+                        }
+                        // console.log(JSON.stringify(users[message.author.tag]));
+                        // console.log(JSON.stringify(sheets[users[message.author.tag]]));
+                        if (users[message.author.tag] === undefined || sheets[users[message.author.tag]] === undefined) {
+                            message.reply('Are you linked to a character ? Be sure your character is registered already.');
+                            break;
+                        }
+                        var rollresult = roll_char(message.author.tag, received[2], received[3]);
+                        if (rollresult) {
+                            message.reply(rollresult);
+                        } else {
+                            message.reply("Sorry, the game seem to be badly set up. You get a critical success on shooting the admin with tomatoes !");
+                        }
+                    }
+                } else {
+                    if (isgameon) {
+                        message.reply(roll(gamedata.dicesystem.dice));
                     }
                 }
                 break;
