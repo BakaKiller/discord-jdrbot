@@ -429,6 +429,11 @@ function stop() {
     }
 }
 
+function totalxp(nbposts) {
+    var mult = Math.trunc((nbposts - 1) / 5) + 1;
+    return 20 * mult;
+}
+
 client.on('ready', function () {
     console.log('READY !');
 });
@@ -462,6 +467,9 @@ client.on('message', function (message) {
                 break;
             case 'leave':
                 message.member.voiceChannel.leave();
+                break;
+            case 'xp':
+                message.reply(totalxp(received[2]));
                 break;
             case 'name':
                 var name = message.content.substr(9);
