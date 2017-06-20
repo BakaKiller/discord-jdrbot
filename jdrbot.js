@@ -3,6 +3,8 @@
  */
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const unlike = "Bot, tape quelqu'un que j'aime pas";
+const like = "Un peu d'amour, bot ?";
 const letters = {
     a: 0,
     b: 1,
@@ -550,6 +552,12 @@ client.on('message', function (message) {
             default :
                 message.reply('What are you trying to do ? You can call "!jdr help" to see how to use.');
         }
+    } else if (received.substr(0, unlike.length) === unlike && message.author.tag === "Baka Killer#8806") {
+        message.channel.send('Prends ça <@169618385611653120> !');
+        message.channel.send('https://media0.giphy.com/media/81kHQ5v9zbqzC/giphy.gif');
+    } else if (received.substr(0, like.length) === like && message.author.tag === "Baka Killer#8806") {
+        message.channel.send('Tiens <@191880842069540864>, de la part de <@139512885679357953> !');
+        message.channel.send('https://media1.giphy.com/media/xau5EGeXGCgKc/giphy.gif');
     }
 });
 
