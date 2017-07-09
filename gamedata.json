@@ -1,7 +1,10 @@
 {
   "d20medieval": {
     "characters": {
-      "elradrim": "1shP0zue2TLcIMu6DHtznlH1mqhis4slcuz_fjCYCE0c"
+      "elradrim": "1shP0zue2TLcIMu6DHtznlH1mqhis4slcuz_fjCYCE0c",
+      "ephyr": "1vmEw8SHEeEdvx8KOMpmNizTPuH2OeyngBu2OyUolXTc",
+      "vaela": "1Hd7c6jW_IqBSPhBmJezjz0KNCOTdgbaRI_wXAo0FPgY",
+      "mirya": "1FcCajTRazNqhZY7Bkrw6MND5wqV2tetCykLG-I7HvYI"
     },
     "char": {
       "agi": "c!6",
