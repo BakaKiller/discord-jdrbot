@@ -246,6 +246,7 @@ function get_number(name) {
     for (var i = 0; i < name.length; i++) {
         sum += (alphabet.indexOf(name[i]) + 1);
     }
+    console.log(sum);
     sum = sum.toString().split('');
     var total = 1;
     for (i = 0; i < sum.length; i++) {
