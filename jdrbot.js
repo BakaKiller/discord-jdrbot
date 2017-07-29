@@ -246,7 +246,6 @@ function get_number(name) {
     for (var i = 0; i < name.length; i++) {
         sum += (alphabet.indexOf(name[i]) + 1);
     }
-    console.log(sum);
     sum = sum.toString().split('');
     var total = 1;
     for (i = 0; i < sum.length; i++) {
@@ -269,7 +268,7 @@ function get_number(name) {
     };
     var cat = 0;
     for (i = 0; i < rocknumbers.length; i++) {
-        if (total < rocknumbers[i]) {
+        if (total <= rocknumbers[i]) {
             cat = rocknumbers[i];
             break;
         }
