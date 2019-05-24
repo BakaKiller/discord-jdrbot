@@ -45,7 +45,6 @@ const letters = {
 const token = process.argv[2];
 
 var fs = require('fs');
-var opus = require('node-opus');
 var readline = require('readline');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library');
