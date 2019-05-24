@@ -1,6 +1,4 @@
-/**
- * Created by Baka Killer on 29/05/2017.
- */
+#!/usr/bin/env node
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const unlike = "Bot, tape quelqu'un que j'aime pas";
@@ -44,6 +42,7 @@ const letters = {
     aj: 35,
     ak: 36
 };
+const token = process.argv[2];
 
 var fs = require('fs');
 var opus = require('node-opus');
@@ -239,44 +238,6 @@ function loadgame(game, name, version, chan) {
     }
 }
 
-function get_number(name) {
-    name = name.toLowerCase();
-    var alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
-    var sum = 0;
-    for (var i = 0; i < name.length; i++) {
-        sum += (alphabet.indexOf(name[i]) + 1);
-    }
-    sum = sum.toString().split('');
-    var total = 1;
-    for (i = 0; i < sum.length; i++) {
-        total = total * (sum[i]);
-    }
-
-    if (total >= 50) {
-        total = total / 2;
-    }
-
-    var rocknumbers = [7, 14, 21, 28, 35, 42, 49];
-    var rocks = {
-        7: 'Citrine',
-        14: 'Héliodore',
-        21: 'Apatite',
-        28: 'Lapis-Lazuli',
-        35: 'Garnet',
-        42: 'Quartz',
-        49: 'Morganite'
-    };
-    var cat = 0;
-    for (i = 0; i < rocknumbers.length; i++) {
-        if (total <= rocknumbers[i]) {
-            cat = rocknumbers[i];
-            break;
-        }
-    }
-
-    return rocks[cat];
-}
-
 function savegame(name, version) {
     if (isgameon && ongoinggame !== null && name !== null && version !== null) {
         var ok = true;
@@ -412,30 +373,6 @@ function get_system_val(val) {
     return gamedata.dicesystem[val];
 }
 
-function play(track) {
-    if (track !== '') {
-        dispatcher = voicechan.playFile('./audio/' + track + '.mp3');
-        dispatcher.on("end", function (end) {
-            play(track);
-        });
-    } else {
-        dispatcher.pause();
-        dispatcher = null;
-    }
-}
-
-function stop() {
-    if (dispatcher !== null) {
-        dispatcher.pause();
-        dispatcher = null;
-    }
-}
-
-function totalxp(nbposts) {
-    var mult = Math.trunc((nbposts - 1) / 5) + 1;
-    return 20 * mult;
-}
-
 client.on('ready', function () {
     console.log('READY !');
 });
@@ -452,26 +389,6 @@ client.on('message', function (message) {
                 break;
             case 'stop':
                 stop();
-                break;
-            case 'join':
-                if (!message.guild) {
-                    message.reply('This command is only usable on a Guild.');
-                    break;
-                }
-                if (message.member.voiceChannel) {
-                    message.member.voiceChannel.join().then(function (connection) {
-                        voicechan = connection;
-                        console.log('Connected to a voice channel.');
-                    }).catch(function(error) {
-                        console.log('Error !' + error)
-                    });
-                }
-                break;
-            case 'leave':
-                message.member.voiceChannel.leave();
-                break;
-            case 'xp':
-                message.reply(totalxp(received[2]));
                 break;
             case 'name':
                 var name = message.content.substr(9);
@@ -552,25 +469,7 @@ client.on('message', function (message) {
             default :
                 message.reply('What are you trying to do ? You can call "!jdr help" to see how to use.');
         }
-    } else if (received.substr(0, unlike.length) === unlike && message.author.tag === "Baka Killer#8806") {
-        message.channel.send('Prends ça <@169618385611653120> !');
-        message.channel.send('https://media0.giphy.com/media/81kHQ5v9zbqzC/giphy.gif');
-    } else if (received.substr(0, like.length) === like && message.author.tag === "Baka Killer#8806") {
-        message.channel.send('Tiens <@191880842069540864>, de la part de <@139512885679357953> !');
-        message.channel.send('https://media1.giphy.com/media/xau5EGeXGCgKc/giphy.gif');
     }
 });
 
-client.login('MzE4NTI0MjQzOTcxNDA3ODg3.DAzoYg.nZyECJ-aERngiIpLjhltKwKbIpg');
-
-//
-// var http = require('http');
-// var url = require('url');
-//
-// var server = http.createServer(function (req, res) {
-//     res.writeHead(200, {"Content-Type": "application/json"});
-//     var myurl = url.parse(req.url).pathname;
-//     res.end(JSON.stringify({object: "THIS", machin: "THAT", url: myurl}));
-// });
-//
-// server.listen(8080);
+client.login(token);
